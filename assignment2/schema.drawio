@@ -1,0 +1,112 @@
+<mxfile host="app.diagrams.net" modified="2026-08-16T00:00:00.000Z" agent="CampusEats" version="24.0.0" type="device">
+  <diagram name="ER Schema" id="er-schema">
+    <mxGraphModel dx="1600" dy="1000" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1650" pageHeight="1200" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <mxCell id="title" value="CampusEats — Database Schema / ER Diagram (Task 5)" style="text;html=1;fontSize=18;fontStyle=1;align=left;" vertex="1" parent="1">
+          <mxGeometry x="30" y="10" width="600" height="30" as="geometry" />
+        </mxCell>
+
+        <!-- ===================== USER SERVICE ===================== -->
+        <mxCell id="grp_user" value="User Service" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;verticalAlign=top;fontStyle=1;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="30" y="60" width="380" height="230" as="geometry" />
+        </mxCell>
+        <mxCell id="t_users" value="Users&#10;--------------------&#10;user_id : UUID  (PK)&#10;name : VARCHAR&#10;email : VARCHAR (UNIQUE)&#10;password_hash : VARCHAR&#10;role : ENUM(student,vendor,agent)&#10;created_at : TIMESTAMP" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;align=left;spacingLeft=6;fontSize=11;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="50" y="90" width="180" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="t_addresses" value="Addresses&#10;--------------------&#10;address_id : UUID (PK)&#10;user_id : UUID (FK -> Users)&#10;line1 : VARCHAR&#10;city : VARCHAR&#10;pincode : VARCHAR&#10;is_default : BOOLEAN" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#6c8ebf;align=left;spacingLeft=6;fontSize=11;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="240" y="90" width="150" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="e_ua" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=ERone;startArrow=ERmany;" edge="1" parent="1" source="t_users" target="t_addresses">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ===================== CATALOGUE SERVICE ===================== -->
+        <mxCell id="grp_cat" value="Catalogue Service" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;verticalAlign=top;fontStyle=1;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="450" y="60" width="560" height="230" as="geometry" />
+        </mxCell>
+        <mxCell id="t_vendors" value="Vendors&#10;--------------------&#10;vendor_id : UUID (PK)&#10;name : VARCHAR&#10;campus_location : VARCHAR&#10;opening_time : TIME&#10;closing_time : TIME&#10;owner_user_id : UUID (ref only)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;align=left;spacingLeft=6;fontSize=11;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="470" y="90" width="190" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="t_categories" value="Categories&#10;--------------------&#10;category_id : UUID (PK)&#10;vendor_id : UUID (FK -> Vendors)&#10;name : VARCHAR" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;align=left;spacingLeft=6;fontSize=11;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="680" y="90" width="170" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="t_menuitems" value="MenuItems&#10;--------------------&#10;item_id : UUID (PK)&#10;vendor_id : UUID (FK -> Vendors)&#10;category_id : UUID (FK -> Categories)&#10;name : VARCHAR&#10;price : DECIMAL&#10;in_stock : BOOLEAN" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#82b366;align=left;spacingLeft=6;fontSize=11;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="680" y="190" width="200" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="e_vc" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=ERone;startArrow=ERmany;" edge="1" parent="1" source="t_vendors" target="t_categories">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_vm" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=ERone;startArrow=ERmany;" edge="1" parent="1" source="t_vendors" target="t_menuitems">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_cm" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=ERone;startArrow=ERmany;" edge="1" parent="1" source="t_categories" target="t_menuitems">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ===================== ORDER SERVICE ===================== -->
+        <mxCell id="grp_order" value="Order Service" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe6cc;strokeColor=#d79b00;verticalAlign=top;fontStyle=1;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="30" y="330" width="580" height="250" as="geometry" />
+        </mxCell>
+        <mxCell id="t_orders" value="Orders&#10;--------------------&#10;order_id : UUID (PK)&#10;user_id : UUID (ref only)&#10;vendor_id : UUID (ref only)&#10;status : ENUM&#10;total_amount : DECIMAL&#10;fulfillment_type : ENUM(delivery,pickup)&#10;created_at : TIMESTAMP" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d79b00;align=left;spacingLeft=6;fontSize=11;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="50" y="360" width="220" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="t_orderitems" value="OrderItems&#10;--------------------&#10;order_item_id : UUID (PK)&#10;order_id : UUID (FK -> Orders)&#10;item_id : UUID (ref only)&#10;item_name_snapshot : VARCHAR&#10;quantity : INT&#10;unit_price_snapshot : DECIMAL" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d79b00;align=left;spacingLeft=6;fontSize=11;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="310" y="360" width="220" height="130" as="geometry" />
+        </mxCell>
+        <mxCell id="t_orderhist" value="OrderStatusHistory&#10;--------------------&#10;history_id : UUID (PK)&#10;order_id : UUID (FK -> Orders)&#10;status : ENUM&#10;changed_at : TIMESTAMP" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d79b00;align=left;spacingLeft=6;fontSize=11;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="50" y="440" width="220" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="e_oo1" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=ERone;startArrow=ERmany;" edge="1" parent="1" source="t_orders" target="t_orderitems">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="e_oo2" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=ERone;startArrow=ERmany;" edge="1" parent="1" source="t_orders" target="t_orderhist">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ===================== PAYMENT SERVICE ===================== -->
+        <mxCell id="grp_pay" value="Payment Service" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff2cc;strokeColor=#d6b656;verticalAlign=top;fontStyle=1;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="650" y="330" width="420" height="250" as="geometry" />
+        </mxCell>
+        <mxCell id="t_payments" value="Payments&#10;--------------------&#10;payment_id : UUID (PK)&#10;order_id : UUID (ref only)&#10;user_id : UUID (ref only)&#10;amount : DECIMAL&#10;status : ENUM&#10;method : VARCHAR&#10;created_at : TIMESTAMP" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d6b656;align=left;spacingLeft=6;fontSize=11;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="670" y="360" width="200" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="t_transactions" value="Transactions&#10;--------------------&#10;transaction_id : UUID (PK)&#10;payment_id : UUID (FK -> Payments)&#10;gateway_ref : VARCHAR&#10;transaction_type : ENUM(charge,refund)&#10;amount : DECIMAL&#10;created_at : TIMESTAMP" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#d6b656;align=left;spacingLeft=6;fontSize=11;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="900" y="360" width="150" height="150" as="geometry" />
+        </mxCell>
+        <mxCell id="e_pt" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=ERone;startArrow=ERmany;" edge="1" parent="1" source="t_payments" target="t_transactions">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ===================== DELIVERY SERVICE ===================== -->
+        <mxCell id="grp_del" value="Delivery Service" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;verticalAlign=top;fontStyle=1;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="30" y="610" width="440" height="230" as="geometry" />
+        </mxCell>
+        <mxCell id="t_agents" value="DeliveryAgents&#10;--------------------&#10;agent_id : UUID (PK)&#10;name : VARCHAR&#10;phone : VARCHAR&#10;status : ENUM(available,busy,off)" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#b85450;align=left;spacingLeft=6;fontSize=11;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="50" y="640" width="190" height="110" as="geometry" />
+        </mxCell>
+        <mxCell id="t_deliveries" value="Deliveries&#10;--------------------&#10;delivery_id : UUID (PK)&#10;order_id : UUID (ref only)&#10;agent_id : UUID (FK -> DeliveryAgents)&#10;pickup_location : VARCHAR&#10;drop_location : VARCHAR&#10;status : ENUM&#10;eta : TIMESTAMP" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#b85450;align=left;spacingLeft=6;fontSize=11;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="260" y="640" width="200" height="160" as="geometry" />
+        </mxCell>
+        <mxCell id="e_ad" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=ERone;startArrow=ERmany;" edge="1" parent="1" source="t_agents" target="t_deliveries">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ===================== REVIEW SERVICE ===================== -->
+        <mxCell id="grp_rev" value="Review Service" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;verticalAlign=top;fontStyle=1;fontSize=13;" vertex="1" parent="1">
+          <mxGeometry x="510" y="610" width="260" height="230" as="geometry" />
+        </mxCell>
+        <mxCell id="t_reviews" value="Reviews&#10;--------------------&#10;review_id : UUID (PK)&#10;order_id : UUID (ref only)&#10;user_id : UUID (ref only)&#10;vendor_id : UUID (ref only)&#10;rating : INT (1-5)&#10;comment : TEXT&#10;created_at : TIMESTAMP" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#9673a6;align=left;spacingLeft=6;fontSize=11;fontFamily=Courier New;" vertex="1" parent="1">
+          <mxGeometry x="530" y="640" width="220" height="170" as="geometry" />
+        </mxCell>
+
+        <!-- Note about cross-service references -->
+        <mxCell id="note" value="Dashed boundary rule: fields marked (ref only) store IDs owned by another service&#10;as plain values — never a foreign-key constraint across service boundaries.&#10;Only same-service FKs are drawn as ER edges above." style="text;html=1;fontSize=11;fontStyle=2;align=left;fillColor=none;" vertex="1" parent="1">
+          <mxGeometry x="820" y="610" width="500" height="60" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
