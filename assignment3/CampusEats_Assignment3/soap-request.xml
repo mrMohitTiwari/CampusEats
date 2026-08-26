@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope
+    xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+    xmlns:pay="https://schemas.paysecure.example/v1">
+  <soapenv:Header>
+    <pay:AuthHeader>
+      <pay:merchantId>campuseats-univ-001</pay:merchantId>
+      <pay:apiKey>ps_test_7d8f2a1c</pay:apiKey>
+      <pay:requestTimestamp>2026-08-26T10:15:30Z</pay:requestTimestamp>
+    </pay:AuthHeader>
+  </soapenv:Header>
+  <soapenv:Body>
+    <pay:ChargePaymentRequest>
+      <pay:merchantOrderId>ORD-2026-000184</pay:merchantOrderId>
+      <pay:amount>248.00</pay:amount>
+      <pay:currency>INR</pay:currency>
+      <pay:paymentToken>tok_visa_8f14e45f</pay:paymentToken>
+      <pay:idempotencyKey>ce-ORD-2026-000184-charge-1</pay:idempotencyKey>
+    </pay:ChargePaymentRequest>
+  </soapenv:Body>
+</soapenv:Envelope>

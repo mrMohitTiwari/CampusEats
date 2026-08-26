@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<soapenv:Envelope
+    xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/"
+    xmlns:pay="https://schemas.paysecure.example/v1">
+  <soapenv:Header/>
+  <soapenv:Body>
+    <pay:ChargePaymentResponse>
+      <pay:gatewayTransactionId>PGT-9A73C20461</pay:gatewayTransactionId>
+      <pay:status>AUTHORIZED</pay:status>
+      <pay:authorizedAmount>248.00</pay:authorizedAmount>
+      <pay:currency>INR</pay:currency>
+      <pay:processedAt>2026-08-26T10:15:31Z</pay:processedAt>
+    </pay:ChargePaymentResponse>
+  </soapenv:Body>
+</soapenv:Envelope>
