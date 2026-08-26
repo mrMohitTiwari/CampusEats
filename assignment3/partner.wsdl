@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<wsdl:definitions
+    xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+    xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+    xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+    xmlns:tns="https://schemas.paysecure.example/v1"
+    targetNamespace="https://schemas.paysecure.example/v1"
+    name="PaySecureGatewayService">
+
+  <wsdl:types>
+    <xsd:schema targetNamespace="https://schemas.paysecure.example/v1"
+                elementFormDefault="qualified">
+      <xsd:element name="AuthHeader">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="merchantId" type="xsd:string"/>
+            <xsd:element name="apiKey" type="xsd:string"/>
+            <xsd:element name="requestTimestamp" type="xsd:dateTime"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="ChargePaymentRequest">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="merchantOrderId" type="xsd:string"/>
+            <xsd:element name="amount" type="xsd:decimal"/>
+            <xsd:element name="currency" type="xsd:string"/>
+            <xsd:element name="paymentToken" type="xsd:string"/>
+            <xsd:element name="idempotencyKey" type="xsd:string"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="ChargePaymentResponse">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="gatewayTransactionId" type="xsd:string"/>
+            <xsd:element name="status" type="xsd:string"/>
+            <xsd:element name="authorizedAmount" type="xsd:decimal"/>
+            <xsd:element name="currency" type="xsd:string"/>
+            <xsd:element name="processedAt" type="xsd:dateTime"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+
+      <xsd:element name="GatewayFault">
+        <xsd:complexType>
+          <xsd:sequence>
+            <xsd:element name="code" type="xsd:string"/>
+            <xsd:element name="message" type="xsd:string"/>
+            <xsd:element name="retryable" type="xsd:boolean"/>
+            <xsd:element name="gatewayReference" type="xsd:string" minOccurs="0"/>
+          </xsd:sequence>
+        </xsd:complexType>
+      </xsd:element>
+    </xsd:schema>
+  </wsdl:types>
+
+  <wsdl:message name="AuthHeaderMessage">
+    <wsdl:part name="auth" element="tns:AuthHeader"/>
+  </wsdl:message>
+  <wsdl:message name="ChargePaymentInput">
+    <wsdl:part name="parameters" element="tns:ChargePaymentRequest"/>
+  </wsdl:message>
+  <wsdl:message name="ChargePaymentOutput">
+    <wsdl:part name="parameters" element="tns:ChargePaymentResponse"/>
+  </wsdl:message>
+  <wsdl:message name="GatewayFaultMessage">
+    <wsdl:part name="fault" element="tns:GatewayFault"/>
+  </wsdl:message>
+
+  <wsdl:portType name="PaySecureGatewayPortType">
+    <wsdl:operation name="chargePayment">
+      <wsdl:input message="tns:ChargePaymentInput"/>
+      <wsdl:output message="tns:ChargePaymentOutput"/>
+      <wsdl:fault name="GatewayFault" message="tns:GatewayFaultMessage"/>
+    </wsdl:operation>
+  </wsdl:portType>
+
+  <wsdl:binding name="PaySecureGatewaySoapBinding"
+                type="tns:PaySecureGatewayPortType">
+    <soap:binding style="document"
+                  transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="chargePayment">
+      <soap:operation
+          soapAction="https://api.paysecure.example/soap/v1/chargePayment"
+          style="document"/>
+      <wsdl:input>
+        <soap:header message="tns:AuthHeaderMessage" part="auth" use="literal"/>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="GatewayFault">
+        <soap:fault name="GatewayFault" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+  </wsdl:binding>
+
+  <wsdl:service name="PaySecureGatewayService">
+    <wsdl:documentation>
+      Design-time partner contract used by the CampusEats Payment Service.
+    </wsdl:documentation>
+    <wsdl:port name="PaySecureGatewayPort"
+               binding="tns:PaySecureGatewaySoapBinding">
+      <soap:address location="https://api.paysecure.example/soap/v1/payments"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
