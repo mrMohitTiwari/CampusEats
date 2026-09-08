@@ -2,7 +2,7 @@
 
 Course assignment repository for **CS 543 Web Services**. It contains the
 CampusEats HTTP investigation, service design, and external SOAP partner
-integration completed across Assignments 1–3.
+integration completed across Assignments 1–4.
 
 ## Team
 
@@ -60,3 +60,7 @@ Used PowerShell with `curl.exe -i` against JSONPlaceholder API:
 The assignment structure and deliverables are committed incrementally to show
 the development history. Assignment 3 is complete and its upload archive is
 available in the `assignment3` directory.
+
+## Assignment 4 — Orders REST Service
+
+See [assignment4/NOTES.md](assignment4/NOTES.md) for the team details, resource model, SOAP comparison, setup instructions, and retry/fallback design. The folder includes the OpenAPI contract, Flask implementation, tests, an independent Payments demo, and captured curl/validator/pytest evidence.
