@@ -1,0 +1,124 @@
+$ curl -i -sS --max-time 15 -X POST -H 'Content-Type: application/json' --data '{"user_id": "11111111-1111-4111-8111-111111111111", "vendor_id": "22222222-2222-4222-8222-222222222222", "fulfillment_type": "pickup", "payment_token": "demo-token", "items": [{"item_id": "33333333-3333-4333-8333-333333333333", "item_name_snapshot": "Veg thali", "quantity": 2, "unit_price_snapshot": "75.00"}]}' -H 'Idempotency-Key: curl-demo-1' http://127.0.0.1:5000/orders
+HTTP/1.1 201 CREATED
+Server: Werkzeug/3.1.8 Python/3.9.6
+Date: Tue, 08 Sep 2026 12:52:42 GMT
+Content-Type: application/json
+Content-Length: 407
+Location: /orders/8a872b40-cb71-4806-9a89-371dc0e6f8e1
+Connection: close
+
+{"created_at":"2026-09-08T12:52:42.168534+00:00","fulfillment_type":"pickup","items":[{"item_id":"33333333-3333-4333-8333-333333333333","item_name_snapshot":"Veg thali","quantity":2,"unit_price_snapshot":"75.00"}],"order_id":"8a872b40-cb71-4806-9a89-371dc0e6f8e1","status":"PLACED","total_amount":"150.00","user_id":"11111111-1111-4111-8111-111111111111","vendor_id":"22222222-2222-4222-8222-222222222222"}
+
+
+$ curl -i -sS --max-time 15 -X POST -H 'Content-Type: application/json' --data '{"user_id": "11111111-1111-4111-8111-111111111111", "vendor_id": "22222222-2222-4222-8222-222222222222", "fulfillment_type": "pickup", "payment_token": "demo-token", "items": [{"item_id": "33333333-3333-4333-8333-333333333333", "item_name_snapshot": "Veg thali", "quantity": 2, "unit_price_snapshot": "75.00"}]}' -H 'Idempotency-Key: curl-demo-1' http://127.0.0.1:5000/orders
+HTTP/1.1 201 CREATED
+Server: Werkzeug/3.1.8 Python/3.9.6
+Date: Tue, 08 Sep 2026 12:52:42 GMT
+Content-Type: application/json
+Content-Length: 407
+Location: /orders/8a872b40-cb71-4806-9a89-371dc0e6f8e1
+Connection: close
+
+{"created_at":"2026-09-08T12:52:42.168534+00:00","fulfillment_type":"pickup","items":[{"item_id":"33333333-3333-4333-8333-333333333333","item_name_snapshot":"Veg thali","quantity":2,"unit_price_snapshot":"75.00"}],"order_id":"8a872b40-cb71-4806-9a89-371dc0e6f8e1","status":"PLACED","total_amount":"150.00","user_id":"11111111-1111-4111-8111-111111111111","vendor_id":"22222222-2222-4222-8222-222222222222"}
+
+
+$ curl -i -sS --max-time 15 -X POST -H 'Content-Type: application/json' --data '{' -H 'Idempotency-Key: malformed' http://127.0.0.1:5000/orders
+HTTP/1.1 400 BAD REQUEST
+Server: Werkzeug/3.1.8 Python/3.9.6
+Date: Tue, 08 Sep 2026 12:52:42 GMT
+Content-Type: application/problem+json
+Content-Length: 146
+Connection: close
+
+{"detail":"The browser (or proxy) sent a request that this server could not understand.","status":400,"title":"Bad Request","type":"about:blank"}
+
+
+$ curl -i -sS --max-time 15 http://127.0.0.1:5000/orders/00000000-0000-4000-8000-000000000000
+HTTP/1.1 404 NOT FOUND
+Server: Werkzeug/3.1.8 Python/3.9.6
+Date: Tue, 08 Sep 2026 12:52:42 GMT
+Content-Type: application/problem+json
+Content-Length: 89
+Connection: close
+
+{"detail":"Order does not exist.","status":404,"title":"Not Found","type":"about:blank"}
+
+
+$ curl -i -sS --max-time 15 http://127.0.0.1:5000/orders/8a872b40-cb71-4806-9a89-371dc0e6f8e1
+HTTP/1.1 200 OK
+Server: Werkzeug/3.1.8 Python/3.9.6
+Date: Tue, 08 Sep 2026 12:52:42 GMT
+Content-Type: application/json
+Content-Length: 407
+Connection: close
+
+{"created_at":"2026-09-08T12:52:42.168534+00:00","fulfillment_type":"pickup","items":[{"item_id":"33333333-3333-4333-8333-333333333333","item_name_snapshot":"Veg thali","quantity":2,"unit_price_snapshot":"75.00"}],"order_id":"8a872b40-cb71-4806-9a89-371dc0e6f8e1","status":"PLACED","total_amount":"150.00","user_id":"11111111-1111-4111-8111-111111111111","vendor_id":"22222222-2222-4222-8222-222222222222"}
+
+
+$ curl -i -sS --max-time 15 'http://127.0.0.1:5000/orders?status=PLACED'
+HTTP/1.1 200 OK
+Server: Werkzeug/3.1.8 Python/3.9.6
+Date: Tue, 08 Sep 2026 12:52:42 GMT
+Content-Type: application/json
+Content-Length: 420
+Connection: close
+
+{"orders":[{"created_at":"2026-09-08T12:52:42.168534+00:00","fulfillment_type":"pickup","items":[{"item_id":"33333333-3333-4333-8333-333333333333","item_name_snapshot":"Veg thali","quantity":2,"unit_price_snapshot":"75.00"}],"order_id":"8a872b40-cb71-4806-9a89-371dc0e6f8e1","status":"PLACED","total_amount":"150.00","user_id":"11111111-1111-4111-8111-111111111111","vendor_id":"22222222-2222-4222-8222-222222222222"}]}
+
+
+$ curl -i -sS --max-time 15 -X POST -H 'Content-Type: application/json' --data '{"reason": "Changed plans"}' http://127.0.0.1:5000/orders/8a872b40-cb71-4806-9a89-371dc0e6f8e1/cancellation
+HTTP/1.1 201 CREATED
+Server: Werkzeug/3.1.8 Python/3.9.6
+Date: Tue, 08 Sep 2026 12:52:42 GMT
+Content-Type: application/json
+Content-Length: 127
+Location: /orders/8a872b40-cb71-4806-9a89-371dc0e6f8e1/cancellation
+Connection: close
+
+{"cancelled_at":"2026-09-08T12:52:42.221648+00:00","order_id":"8a872b40-cb71-4806-9a89-371dc0e6f8e1","reason":"Changed plans"}
+
+
+$ curl -i -sS --max-time 15 -X POST -H 'Content-Type: application/json' --data '{"reason": "Again"}' http://127.0.0.1:5000/orders/8a872b40-cb71-4806-9a89-371dc0e6f8e1/cancellation
+HTTP/1.1 409 CONFLICT
+Server: Werkzeug/3.1.8 Python/3.9.6
+Date: Tue, 08 Sep 2026 12:52:42 GMT
+Content-Type: application/problem+json
+Content-Length: 104
+Connection: close
+
+{"detail":"Only a PLACED order can be cancelled.","status":409,"title":"Conflict","type":"about:blank"}
+
+
+$ curl -i -sS --max-time 15 http://127.0.0.1:5000/orders/8a872b40-cb71-4806-9a89-371dc0e6f8e1/cancellation
+HTTP/1.1 200 OK
+Server: Werkzeug/3.1.8 Python/3.9.6
+Date: Tue, 08 Sep 2026 12:52:42 GMT
+Content-Type: application/json
+Content-Length: 127
+Connection: close
+
+{"cancelled_at":"2026-09-08T12:52:42.221648+00:00","order_id":"8a872b40-cb71-4806-9a89-371dc0e6f8e1","reason":"Changed plans"}
+
+
+$ curl -i -sS --max-time 15 -X POST -H 'Content-Type: application/json' --data '{"user_id": "11111111-1111-4111-8111-111111111111", "vendor_id": "22222222-2222-4222-8222-222222222222", "fulfillment_type": "pickup", "payment_token": "decline-demo", "items": [{"item_id": "33333333-3333-4333-8333-333333333333", "item_name_snapshot": "Veg thali", "quantity": 2, "unit_price_snapshot": "75.00"}]}' -H 'Idempotency-Key: curl-decline' http://127.0.0.1:5000/orders
+HTTP/1.1 422 UNPROCESSABLE ENTITY
+Server: Werkzeug/3.1.8 Python/3.9.6
+Date: Tue, 08 Sep 2026 12:52:42 GMT
+Content-Type: application/problem+json
+Content-Length: 147
+Connection: close
+
+{"detail":"PAYMENT_DECLINED: Payment was declined. Use another payment method.","status":422,"title":"Unprocessable Content","type":"about:blank"}
+
+
+$ curl -i -sS --max-time 15 -X POST -H 'Content-Type: application/json' --data '{"user_id": "11111111-1111-4111-8111-111111111111", "vendor_id": "22222222-2222-4222-8222-222222222222", "fulfillment_type": "pickup", "payment_token": "demo-token", "items": [{"item_id": "33333333-3333-4333-8333-333333333333", "item_name_snapshot": "Veg thali", "quantity": 2, "unit_price_snapshot": "75.00"}]}' -H 'Idempotency-Key: curl-unavailable' http://127.0.0.1:5000/orders
+HTTP/1.1 503 SERVICE UNAVAILABLE
+Server: Werkzeug/3.1.8 Python/3.9.6
+Date: Tue, 08 Sep 2026 12:52:42 GMT
+Content-Type: application/problem+json
+Content-Length: 135
+Connection: close
+
+{"detail":"PAYMENT_UNAVAILABLE: retry with the same Idempotency-Key.","status":503,"title":"Service Unavailable","type":"about:blank"}
+
+
