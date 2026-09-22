@@ -1,0 +1,134 @@
+openapi: 3.0.3
+info:
+  title: CampusEats API
+  version: 5.0.0
+  description: CS 543 Assignment 5 — HTTP Methods & Headers
+servers:
+  - url: http://localhost:3000
+paths:
+  /menu:
+    get:
+      summary: List menu (filter/sort/paginate)
+      parameters:
+        - { name: q, in: query, schema: { type: string } }
+        - { name: sort, in: query, schema: { type: string } }
+        - { name: order, in: query, schema: { type: string, enum: [asc, desc] } }
+        - { name: page, in: query, schema: { type: integer, default: 1 } }
+        - { name: limit, in: query, schema: { type: integer, default: 10 } }
+      responses:
+        '200': { description: OK, headers: { X-RateLimit-Limit: { schema: { type: integer } }, X-RateLimit-Remaining: { schema: { type: integer } } } }
+        '406': { description: Not Acceptable }
+  /menu/{id}:
+    parameters:
+      - { name: id, in: path, required: true, schema: { type: string } }
+    get:
+      responses:
+        '200': { description: OK, headers: { ETag: { schema: { type: string } }, Cache-Control: { schema: { type: string } } } }
+        '304': { description: Not Modified }
+        '404': { description: Not Found }
+    put:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { name: If-Match, in: header, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [name, price]
+              properties:
+                name: { type: string }
+                price: { type: number }
+                available: { type: boolean }
+      responses:
+        '200': { description: Replaced }
+        '412': { description: Precondition Failed }
+        '422': { description: Unprocessable Entity }
+    patch:
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200': { description: Modified }
+        '412': { description: Precondition Failed }
+    delete:
+      security: [{ bearerAuth: [] }]
+      responses:
+        '204': { description: Deleted }
+        '404': { description: Not Found }
+    options:
+      responses:
+        '204': { description: CORS preflight, headers: { Allow: { schema: { type: string } } } }
+  /menu/{id}/availability:
+    post:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [available]
+              properties:
+                available: { type: boolean }
+      responses:
+        '200': { description: Availability updated }
+        '422': { description: Unprocessable Entity }
+  /orders:
+    get:
+      security: [{ bearerAuth: [] }]
+      responses:
+        '200': { description: OK }
+    post:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { name: Idempotency-Key, in: header, schema: { type: string } }
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [itemId, quantity]
+              properties:
+                itemId: { type: string }
+                quantity: { type: integer }
+      responses:
+        '201': { description: Created, headers: { Location: { schema: { type: string } } } }
+        '400': { description: Bad Request }
+        '409': { description: Conflict }
+        '422': { description: Unprocessable Entity }
+  /orders/{id}:
+    get:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: OK, headers: { ETag: { schema: { type: string } } } }
+        '304': { description: Not Modified }
+        '404': { description: Not Found }
+  /orders/{id}/cancel:
+    post:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: Cancelled }
+        '404': { description: Not Found }
+        '409': { description: Conflict }
+  /orders/{id}/checkout:
+    post:
+      security: [{ bearerAuth: [] }]
+      parameters:
+        - { name: id, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: Checked out }
+        '404': { description: Not Found }
+        '409': { description: Conflict }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT

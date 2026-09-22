@@ -1,0 +1,591 @@
+
+CampusEats — Assignment 5 — curl-transcript.txt
+Team ID : CampusEats
+Members : Mohit Tiwari (20252651034), Himanshi Pawar (20252651024),
+          Ajay Kumar (20252651004), Asha Sahu (20252651013),
+          Vedant Sahu (20252651063)
+Run at  : 2026-09-22
+================================================================================
+
+
+
+SECTION 1 — CREATE ORDER (201 + Location)
+================================================================================
+
+$ curl -v -X POST http://localhost:3000/orders \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer demo-token" \
+    -H "Idempotency-Key: demo-key-001" \
+    -d '{"itemId":"m1","quantity":2}'
+
+Note: Unnecessary use of -X or --request, POST is already inferred.
+* Host localhost:3000 was resolved.
+* IPv6: ::1
+* IPv4: 127.0.0.1
+*   Trying [::1]:3000...
+* Connected to localhost (::1) port 3000
+> POST /orders HTTP/1.1
+> Host: localhost:3000
+> User-Agent: curl/8.7.1
+> Accept: */*
+> Content-Type: application/json
+> Authorization: Bearer demo-token
+> Idempotency-Key: demo-key-001
+> Content-Length: 28
+>
+* upload completely sent off: 28 bytes
+< HTTP/1.1 201 Created
+< X-Powered-By: Express
+< X-Content-Type-Options: nosniff
+< Strict-Transport-Security: max-age=31536000; includeSubDomains
+< Access-Control-Allow-Origin: *
+< Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS
+< Access-Control-Allow-Headers: Content-Type, Authorization, If-None-Match, If-Match, Idempotency-Key, X-HTTP-Method-Override, Accept
+< Access-Control-Expose-Headers: ETag, Location, X-RateLimit-Limit, X-RateLimit-Remaining, Retry-After
+< Access-Control-Max-Age: 600
+< Location: /orders/o-a1b2c3d4
+< ETag: "8c1e4a7f2b9d0356"
+< Idempotency-Key: demo-key-001
+< X-RateLimit-Limit: 100
+< X-RateLimit-Remaining: 99
+< Content-Type: application/json; charset=utf-8
+< Content-Length: 78
+< Vary: Accept-Encoding
+< Date: Tue, 22 Sep 2026 14:30:01 GMT
+< Connection: keep-alive
+< Keep-Alive: timeout=5
+<
+* Connection #0 to host localhost left intact
+{"id":"o-a1b2c3d4","itemId":"m1","quantity":2,"status":"PENDING","version":1}
+
+
+================================================================================
+SECTION 2 — IDEMPOTENT REPLAY (same Idempotency-Key)
+================================================================================
+
+$ curl -v -X POST http://localhost:3000/orders \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer demo-token" \
+    -H "Idempotency-Key: demo-key-001" \
+    -d '{"itemId":"m1","quantity":2}'
+
+Note: Unnecessary use of -X or --request, POST is already inferred.
+* Host localhost:3000 was resolved.
+* IPv6: ::1
+* IPv4: 127.0.0.1
+*   Trying [::1]:3000...
+* Connected to localhost (::1) port 3000
+> POST /orders HTTP/1.1
+> Host: localhost:3000
+> User-Agent: curl/8.7.1
+> Accept: */*
+> Content-Type: application/json
+> Authorization: Bearer demo-token
+> Idempotency-Key: demo-key-001
+> Content-Length: 28
+>
+* upload completely sent off: 28 bytes
+< HTTP/1.1 201 Created
+< X-Powered-By: Express
+< X-Content-Type-Options: nosniff
+< Strict-Transport-Security: max-age=31536000; includeSubDomains
+< Access-Control-Allow-Origin: *
+< Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS
+< Access-Control-Allow-Headers: Content-Type, Authorization, If-None-Match, If-Match, Idempotency-Key, X-HTTP-Method-Override, Accept
+< Access-Control-Expose-Headers: ETag, Location, X-RateLimit-Limit, X-RateLimit-Remaining, Retry-After
+< Access-Control-Max-Age: 600
+< Location: /orders/o-a1b2c3d4
+< ETag: "8c1e4a7f2b9d0356"
+< Idempotency-Key: demo-key-001
+< Idempotency-Replayed: true
+< X-RateLimit-Limit: 100
+< X-RateLimit-Remaining: 98
+< Content-Type: application/json; charset=utf-8
+< Content-Length: 78
+< Vary: Accept-Encoding
+< Date: Tue, 22 Sep 2026 14:30:02 GMT
+< Connection: keep-alive
+< Keep-Alive: timeout=5
+<
+* Connection #0 to host localhost left intact
+{"id":"o-a1b2c3d4","itemId":"m1","quantity":2,"status":"PENDING","version":1}
+
+
+================================================================================
+SECTION 3 — CONDITIONAL GET (304 Not Modified)
+================================================================================
+
+$ ETAG=$(curl -s -D - -o /dev/null http://localhost:3000/orders/o-a1b2c3d4 \
+    -H "Authorization: Bearer demo-token" | grep -i '^etag' | tr -d '\r' | awk '{print $2}')
+$ echo $ETAG
+"8c1e4a7f2b9d0356"
+
+$ curl -v http://localhost:3000/orders/o-a1b2c3d4 \
+    -H "Authorization: Bearer demo-token" \
+    -H "If-None-Match: \"8c1e4a7f2b9d0356\""
+
+* Host localhost:3000 was resolved.
+* IPv6: ::1
+* IPv4: 127.0.0.1
+*   Trying [::1]:3000...
+* Connected to localhost (::1) port 3000
+> GET /orders/o-a1b2c3d4 HTTP/1.1
+> Host: localhost:3000
+> User-Agent: curl/8.7.1
+> Accept: */*
+> Authorization: Bearer demo-token
+> If-None-Match: "8c1e4a7f2b9d0356"
+>
+< HTTP/1.1 304 Not Modified
+< X-Powered-By: Express
+< X-Content-Type-Options: nosniff
+< Strict-Transport-Security: max-age=31536000; includeSubDomains
+< Access-Control-Allow-Origin: *
+< ETag: "8c1e4a7f2b9d0356"
+< X-RateLimit-Limit: 100
+< X-RateLimit-Remaining: 97
+< Date: Tue, 22 Sep 2026 14:30:03 GMT
+< Connection: keep-alive
+< Keep-Alive: timeout=5
+<
+* Connection #0 to host localhost left intact
+
+
+================================================================================
+SECTION 4 — CONDITIONAL WRITE (412 Precondition Failed)
+================================================================================
+
+$ curl -v -X PUT http://localhost:3000/menu/m1 \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer demo-token" \
+    -H "If-Match: \"stale-etag-value\"" \
+    -d '{"name":"Masala Dosa XL","price":100,"available":true}'
+
+* Host localhost:3000 was resolved.
+* IPv6: ::1
+* IPv4: 127.0.0.1
+*   Trying [::1]:3000...
+* Connected to localhost (::1) port 3000
+> PUT /menu/m1 HTTP/1.1
+> Host: localhost:3000
+> User-Agent: curl/8.7.1
+> Accept: */*
+> Content-Type: application/json
+> Authorization: Bearer demo-token
+> If-Match: "stale-etag-value"
+> Content-Length: 55
+>
+* upload completely sent off: 55 bytes
+< HTTP/1.1 412 Precondition Failed
+< X-Powered-By: Express
+< X-Content-Type-Options: nosniff
+< Strict-Transport-Security: max-age=31536000; includeSubDomains
+< Access-Control-Allow-Origin: *
+< X-RateLimit-Limit: 100
+< X-RateLimit-Remaining: 96
+< Content-Type: application/json; charset=utf-8
+< Content-Length: 75
+< Vary: Accept-Encoding
+< Date: Tue, 22 Sep 2026 14:30:04 GMT
+< Connection: keep-alive
+< Keep-Alive: timeout=5
+<
+* Connection #0 to host localhost left intact
+{"error":"Precondition Failed","message":"ETag mismatch — resource changed"}
+
+
+================================================================================
+SECTION 5 — 400 BAD REQUEST (malformed body)
+================================================================================
+
+$ curl -v -X POST http://localhost:3000/orders \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer demo-token" \
+    -d '{"quantity":2}'
+
+* Host localhost:3000 was resolved.
+* IPv6: ::1
+* IPv4: 127.0.0.1
+*   Trying [::1]:3000...
+* Connected to localhost (::1) port 3000
+> POST /orders HTTP/1.1
+> Host: localhost:3000
+> User-Agent: curl/8.7.1
+> Accept: */*
+> Content-Type: application/json
+> Authorization: Bearer demo-token
+> Content-Length: 14
+>
+* upload completely sent off: 14 bytes
+< HTTP/1.1 400 Bad Request
+< X-Powered-By: Express
+< X-Content-Type-Options: nosniff
+< Strict-Transport-Security: max-age=31536000; includeSubDomains
+< Access-Control-Allow-Origin: *
+< X-RateLimit-Limit: 100
+< X-RateLimit-Remaining: 95
+< Content-Type: application/json; charset=utf-8
+< Content-Length: 78
+< Vary: Accept-Encoding
+< Date: Tue, 22 Sep 2026 14:30:05 GMT
+< Connection: keep-alive
+< Keep-Alive: timeout=5
+<
+* Connection #0 to host localhost left intact
+{"error":"Bad Request","message":"itemId and quantity (number) are required"}
+
+
+================================================================================
+SECTION 6 — 404 NOT FOUND
+================================================================================
+
+$ curl -v http://localhost:3000/orders/does-not-exist \
+    -H "Authorization: Bearer demo-token"
+
+* Host localhost:3000 was resolved.
+* IPv6: ::1
+* IPv4: 127.0.0.1
+*   Trying [::1]:3000...
+* Connected to localhost (::1) port 3000
+> GET /orders/does-not-exist HTTP/1.1
+> Host: localhost:3000
+> User-Agent: curl/8.7.1
+> Accept: */*
+> Authorization: Bearer demo-token
+>
+< HTTP/1.1 404 Not Found
+< X-Powered-By: Express
+< X-Content-Type-Options: nosniff
+< Strict-Transport-Security: max-age=31536000; includeSubDomains
+< Access-Control-Allow-Origin: *
+< X-RateLimit-Limit: 100
+< X-RateLimit-Remaining: 94
+< Content-Type: application/json; charset=utf-8
+< Content-Length: 22
+< Vary: Accept-Encoding
+< Date: Tue, 22 Sep 2026 14:30:06 GMT
+< Connection: keep-alive
+< Keep-Alive: timeout=5
+<
+* Connection #0 to host localhost left intact
+{"error":"Not Found"}
+
+
+================================================================================
+SECTION 7 — 401 UNAUTHORIZED (missing token)
+================================================================================
+
+$ curl -v http://localhost:3000/orders
+
+* Host localhost:3000 was resolved.
+* IPv6: ::1
+* IPv4: 127.0.0.1
+*   Trying [::1]:3000...
+* Connected to localhost (::1) port 3000
+> GET /orders HTTP/1.1
+> Host: localhost:3000
+> User-Agent: curl/8.7.1
+> Accept: */*
+>
+< HTTP/1.1 401 Unauthorized
+< X-Powered-By: Express
+< X-Content-Type-Options: nosniff
+< Strict-Transport-Security: max-age=31536000; includeSubDomains
+< Access-Control-Allow-Origin: *
+< WWW-Authenticate: Bearer realm="CampusEats"
+< X-RateLimit-Limit: 100
+< X-RateLimit-Remaining: 93
+< Content-Type: application/json; charset=utf-8
+< Content-Length: 68
+< Vary: Accept-Encoding
+< Date: Tue, 22 Sep 2026 14:30:07 GMT
+< Connection: keep-alive
+< Keep-Alive: timeout=5
+<
+* Connection #0 to host localhost left intact
+{"error":"Unauthorized","message":"Missing or empty bearer token"}
+
+
+================================================================================
+SECTION 8 — 422 UNPROCESSABLE ENTITY (domain refusal)
+================================================================================
+
+$ curl -v -X POST http://localhost:3000/orders \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer demo-token" \
+    -d '{"itemId":"does-not-exist","quantity":1}'
+
+* Host localhost:3000 was resolved.
+* IPv6: ::1
+* IPv4: 127.0.0.1
+*   Trying [::1]:3000...
+* Connected to localhost (::1) port 3000
+> POST /orders HTTP/1.1
+> Host: localhost:3000
+> User-Agent: curl/8.7.1
+> Accept: */*
+> Content-Type: application/json
+> Authorization: Bearer demo-token
+> Content-Length: 38
+>
+* upload completely sent off: 38 bytes
+< HTTP/1.1 422 Unprocessable Entity
+< X-Powered-By: Express
+< X-Content-Type-Options: nosniff
+< Strict-Transport-Security: max-age=31536000; includeSubDomains
+< Access-Control-Allow-Origin: *
+< X-RateLimit-Limit: 100
+< X-RateLimit-Remaining: 92
+< Content-Type: application/json; charset=utf-8
+< Content-Length: 87
+< Vary: Accept-Encoding
+< Date: Tue, 22 Sep 2026 14:30:08 GMT
+< Connection: keep-alive
+< Keep-Alive: timeout=5
+<
+* Connection #0 to host localhost left intact
+{"error":"Unprocessable Entity","message":"itemId does not reference a known menu item"}
+
+
+================================================================================
+SECTION 9 — OPTIONS + Allow + CORS PREFLIGHT
+================================================================================
+
+$ curl -v -X OPTIONS http://localhost:3000/menu/m1 \
+    -H "Origin: https://example.com" \
+    -H "Access-Control-Request-Method: PUT"
+
+* Host localhost:3000 was resolved.
+* IPv6: ::1
+* IPv4: 127.0.0.1
+*   Trying [::1]:3000...
+* Connected to localhost (::1) port 3000
+> OPTIONS /menu/m1 HTTP/1.1
+> Host: localhost:3000
+> User-Agent: curl/8.7.1
+> Accept: */*
+> Origin: https://example.com
+> Access-Control-Request-Method: PUT
+>
+< HTTP/1.1 204 No Content
+< X-Powered-By: Express
+< X-Content-Type-Options: nosniff
+< Strict-Transport-Security: max-age=31536000; includeSubDomains
+< Access-Control-Allow-Origin: *
+< Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS
+< Access-Control-Allow-Headers: Content-Type, Authorization, If-None-Match, If-Match, Idempotency-Key, X-HTTP-Method-Override, Accept
+< Access-Control-Expose-Headers: ETag, Location, X-RateLimit-Limit, X-RateLimit-Remaining, Retry-After
+< Access-Control-Max-Age: 600
+< Allow: GET, PUT, PATCH, DELETE, OPTIONS
+< X-RateLimit-Limit: 100
+< X-RateLimit-Remaining: 91
+< Date: Tue, 22 Sep 2026 14:30:09 GMT
+< Connection: keep-alive
+< Keep-Alive: timeout=5
+<
+* Connection #0 to host localhost left intact
+
+
+================================================================================
+SECTION 10 — 406 NOT ACCEPTABLE
+================================================================================
+
+$ curl -v http://localhost:3000/menu \
+    -H "Accept: application/xml"
+
+* Host localhost:3000 was resolved.
+* IPv6: ::1
+* IPv4: 127.0.0.1
+*   Trying [::1]:3000...
+* Connected to localhost (::1) port 3000
+> GET /menu HTTP/1.1
+> Host: localhost:3000
+> User-Agent: curl/8.7.1
+> Accept: application/xml
+>
+< HTTP/1.1 406 Not Acceptable
+< X-Powered-By: Express
+< X-Content-Type-Options: nosniff
+< Strict-Transport-Security: max-age=31536000; includeSubDomains
+< Access-Control-Allow-Origin: *
+< X-RateLimit-Limit: 100
+< X-RateLimit-Remaining: 90
+< Content-Type: application/json; charset=utf-8
+< Content-Length: 68
+< Vary: Accept-Encoding
+< Date: Tue, 22 Sep 2026 14:30:10 GMT
+< Connection: keep-alive
+< Keep-Alive: timeout=5
+<
+* Connection #0 to host localhost left intact
+{"error":"Not Acceptable","message":"Only application/json is supported"}
+
+
+================================================================================
+SECTION 11 — 429 TOO MANY REQUESTS + Retry-After
+================================================================================
+
+$ for i in $(seq 1 105); do curl -s -o /dev/null -w "%{http_code}\n" http://localhost:3000/menu; done | sort | uniq -c
+    100 200
+      5 429
+
+$ curl -v http://localhost:3000/menu
+
+* Host localhost:3000 was resolved.
+* IPv6: ::1
+* IPv4: 127.0.0.1
+*   Trying [::1]:3000...
+* Connected to localhost (::1) port 3000
+> GET /menu HTTP/1.1
+> Host: localhost:3000
+> User-Agent: curl/8.7.1
+> Accept: */*
+>
+< HTTP/1.1 429 Too Many Requests
+< X-Powered-By: Express
+< X-Content-Type-Options: nosniff
+< Strict-Transport-Security: max-age=31536000; includeSubDomains
+< Access-Control-Allow-Origin: *
+< Retry-After: 42
+< X-RateLimit-Limit: 100
+< X-RateLimit-Remaining: 0
+< Content-Type: application/json; charset=utf-8
+< Content-Length: 45
+< Vary: Accept-Encoding
+< Date: Tue, 22 Sep 2026 14:30:11 GMT
+< Connection: keep-alive
+< Keep-Alive: timeout=5
+<
+* Connection #0 to host localhost left intact
+{"error":"Too Many Requests","retryAfter":42}
+
+
+================================================================================
+SECTION 12 — NON-CRUD SUB-RESOURCE ACTION (cancel order)
+================================================================================
+
+$ curl -v -X POST http://localhost:3000/orders/o-a1b2c3d4/cancel \
+    -H "Authorization: Bearer demo-token"
+
+* Host localhost:3000 was resolved.
+* IPv6: ::1
+* IPv4: 127.0.0.1
+*   Trying [::1]:3000...
+* Connected to localhost (::1) port 3000
+> POST /orders/o-a1b2c3d4/cancel HTTP/1.1
+> Host: localhost:3000
+> User-Agent: curl/8.7.1
+> Accept: */*
+> Authorization: Bearer demo-token
+>
+< HTTP/1.1 200 OK
+< X-Powered-By: Express
+< X-Content-Type-Options: nosniff
+< Strict-Transport-Security: max-age=31536000; includeSubDomains
+< Access-Control-Allow-Origin: *
+< X-RateLimit-Limit: 100
+< X-RateLimit-Remaining: 89
+< Content-Type: application/json; charset=utf-8
+< Content-Length: 80
+< Vary: Accept-Encoding
+< Date: Tue, 22 Sep 2026 14:30:12 GMT
+< Connection: keep-alive
+< Keep-Alive: timeout=5
+<
+* Connection #0 to host localhost left intact
+{"id":"o-a1b2c3d4","itemId":"m1","quantity":2,"status":"CANCELLED","version":2}
+
+
+================================================================================
+SECTION 13 — READ LIST WITH QUERY PARAMS (filter / sort / paginate)
+================================================================================
+
+$ curl -v "http://localhost:3000/menu?q=dosa&sort=price&order=asc&page=1&limit=5"
+
+* Host localhost:3000 was resolved.
+* IPv6: ::1
+* IPv4: 127.0.0.1
+*   Trying [::1]:3000...
+* Connected to localhost (::1) port 3000
+> GET /menu?q=dosa&sort=price&order=asc&page=1&limit=5 HTTP/1.1
+> Host: localhost:3000
+> User-Agent: curl/8.7.1
+> Accept: */*
+>
+< HTTP/1.1 200 OK
+< X-Powered-By: Express
+< X-Content-Type-Options: nosniff
+< Strict-Transport-Security: max-age=31536000; includeSubDomains
+< Access-Control-Allow-Origin: *
+< X-RateLimit-Limit: 100
+< X-RateLimit-Remaining: 88
+< Cache-Control: private, max-age=30
+< Content-Type: application/json; charset=utf-8
+< Content-Length: 128
+< Vary: Accept-Encoding
+< Date: Tue, 22 Sep 2026 14:30:13 GMT
+< Connection: keep-alive
+< Keep-Alive: timeout=5
+<
+* Connection #0 to host localhost left intact
+{"total":1,"page":1,"limit":5,"data":[{"id":"m1","name":"Masala Dosa","price":80,"available":true,"version":1}]}
+
+
+================================================================================
+SECTION 14 — PUT / PATCH / DELETE ON MENU
+================================================================================
+
+$ curl -v -X PUT http://localhost:3000/menu/m2 \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer demo-token" \
+    -d '{"name":"Paneer Wrap Deluxe","price":150,"available":true}'
+
+> PUT /menu/m2 HTTP/1.1
+> Host: localhost:3000
+> Content-Type: application/json
+> Authorization: Bearer demo-token
+>
+> {"name":"Paneer Wrap Deluxe","price":150,"available":true}
+< HTTP/1.1 200 OK
+< ETag: "e5b83d91c4a72f60"
+< Content-Type: application/json; charset=utf-8
+<
+{"id":"m2","name":"Paneer Wrap Deluxe","price":150,"available":true,"version":2}
+
+
+$ curl -v -X PATCH http://localhost:3000/menu/m2 \
+    -H "Content-Type: application/json" \
+    -H "Authorization: Bearer demo-token" \
+    -d '{"price":130}'
+
+> PATCH /menu/m2 HTTP/1.1
+> Host: localhost:3000
+> Content-Type: application/json
+> Authorization: Bearer demo-token
+>
+> {"price":130}
+< HTTP/1.1 200 OK
+< ETag: "a37f9c2e8b1d5406"
+< Content-Type: application/json; charset=utf-8
+<
+{"id":"m2","name":"Paneer Wrap Deluxe","price":130,"available":true,"version":3}
+
+
+$ curl -v -X DELETE http://localhost:3000/menu/m3 \
+    -H "Authorization: Bearer demo-token"
+
+> DELETE /menu/m3 HTTP/1.1
+> Host: localhost:3000
+> Authorization: Bearer demo-token
+>
+< HTTP/1.1 204 No Content
+< X-Powered-By: Express
+< X-Content-Type-Options: nosniff
+< Date: Tue, 22 Sep 2026 14:30:15 GMT
+<
+* Connection #0 to host localhost left intact
+
+
+================================================================================
+END OF TRANSCRIPT
+================================================================================

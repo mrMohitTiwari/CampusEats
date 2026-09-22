@@ -1,0 +1,84 @@
+=== 1. CREATE (201 + Location) ===
+Note: Unnecessary use of -X or --request, POST is already inferred.
+* Host localhost:3000 was resolved.
+* IPv6: ::1
+* IPv4: 127.0.0.1
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0*   Trying [::1]:3000...
+* Connected to localhost (::1) port 3000
+> POST /orders HTTP/1.1
+> Host: localhost:3000
+> User-Agent: curl/8.7.1
+> Accept: */*
+> Content-Type: application/json
+> Authorization: Bearer demo-token
+> Idempotency-Key: demo-key-001
+> Content-Length: 28
+> 
+} [28 bytes data]
+* upload completely sent off: 28 bytes
+< HTTP/1.1 500 Internal Server Error
+< X-Powered-By: Express
+< X-Content-Type-Options: nosniff
+< Strict-Transport-Security: max-age=31536000; includeSubDomains
+< Access-Control-Allow-Origin: *
+< Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS
+< Access-Control-Allow-Headers: Content-Type, Authorization, If-None-Match, If-Match, Idempotency-Key, X-HTTP-Method-Override, Accept
+< Access-Control-Expose-Headers: ETag, Location, X-RateLimit-Limit, X-RateLimit-Remaining, Retry-After
+< Access-Control-Max-Age: 600
+< Content-Type: application/json; charset=utf-8
+< X-RateLimit-Limit: 100
+< X-RateLimit-Remaining: 99
+< Content-Length: 33
+< Vary: Accept-Encoding
+< Date: Tue, 22 Sep 2026 14:24:55 GMT
+< Connection: keep-alive
+< Keep-Alive: timeout=5
+< 
+{ [33 bytes data]
+100    61  100    33  100    28   3427   2908 --:--:-- --:--:-- --:--:--  6777
+* Connection #0 to host localhost left intact
+{"error":"Internal Server Error"}
+=== 2. IDEMPOTENT REPLAY ===
+Note: Unnecessary use of -X or --request, POST is already inferred.
+* Host localhost:3000 was resolved.
+* IPv6: ::1
+* IPv4: 127.0.0.1
+  % Total    % Received % Xferd  Average Speed   Time    Time     Time  Current
+                                 Dload  Upload   Total   Spent    Left  Speed
+  0     0    0     0    0     0      0      0 --:--:-- --:--:-- --:--:--     0*   Trying [::1]:3000...
+* Connected to localhost (::1) port 3000
+> POST /orders HTTP/1.1
+> Host: localhost:3000
+> User-Agent: curl/8.7.1
+> Accept: */*
+> Content-Type: application/json
+> Authorization: Bearer demo-token
+> Idempotency-Key: demo-key-001
+> Content-Length: 28
+> 
+} [28 bytes data]
+* upload completely sent off: 28 bytes
+< HTTP/1.1 500 Internal Server Error
+< X-Powered-By: Express
+< X-Content-Type-Options: nosniff
+< Strict-Transport-Security: max-age=31536000; includeSubDomains
+< Access-Control-Allow-Origin: *
+< Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS
+< Access-Control-Allow-Headers: Content-Type, Authorization, If-None-Match, If-Match, Idempotency-Key, X-HTTP-Method-Override, Accept
+< Access-Control-Expose-Headers: ETag, Location, X-RateLimit-Limit, X-RateLimit-Remaining, Retry-After
+< Access-Control-Max-Age: 600
+< Content-Type: application/json; charset=utf-8
+< X-RateLimit-Limit: 100
+< X-RateLimit-Remaining: 98
+< Content-Length: 33
+< Vary: Accept-Encoding
+< Date: Tue, 22 Sep 2026 14:24:55 GMT
+< Connection: keep-alive
+< Keep-Alive: timeout=5
+< 
+{ [33 bytes data]
+100    61  100    33  100    28  15235  12927 --:--:-- --:--:-- --:--:-- 30500
+* Connection #0 to host localhost left intact
+{"error":"Internal Server Error"}

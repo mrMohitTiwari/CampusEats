@@ -1,0 +1,22 @@
+{
+  "name": "campuseats-assignment5",
+  "version": "1.0.0",
+  "description": "CampusEats Web Services Assignment 5 - HTTP Methods & Headers",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "test": "jest --runInBand"
+  },
+  "dependencies": {
+    "compression": "^1.7.4",
+    "express": "^4.19.2",
+    "uuid": "^9.0.1"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0",
+    "supertest": "^7.0.0"
+  },
+  "jest": {
+    "testEnvironment": "node"
+  }
+}
