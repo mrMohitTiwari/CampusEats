@@ -1,0 +1,42 @@
+# D1: Success transcript (JSON)
+$ curl -i -X POST -H "Content-Type: application/json" -d '{"platform":"leetcode", "code":"print(1)", "language":"python"}' http://localhost:3000/submissions
+HTTP/1.1 201 Created
+Location: /submissions/sub_a1b2c3d4
+Content-Type: application/json; charset=utf-8
+
+{"id":"sub_a1b2c3d4","status":"queued","platform":"leetcode","code":"print(1)","language":"python"}
+
+# D2: Failure transcript - Validation (422)
+$ curl -i -X POST -H "Content-Type: application/json" -d '{"platform":"unknown"}' http://localhost:3000/submissions
+HTTP/1.1 422 Unprocessable Entity
+Content-Type: application/problem+json; charset=utf-8
+
+{"type":"https://api.codinghub.com/errors/validation-failed","title":"Your submission is invalid.","status":422,"detail":"One or more fields failed validation.","errors":[{"field":"platform","reason":"Must be a supported platform (leetcode, codeforces, hackerrank)"},{"field":"code","reason":"Code cannot be empty"},{"field":"language","reason":"Programming language must be specified"}]}
+
+# D2: Failure transcript - Not Found (404)
+$ curl -i http://localhost:3000/submissions/invalid_id
+HTTP/1.1 404 Not Found
+Content-Type: application/problem+json; charset=utf-8
+
+{"type":"https://api.codinghub.com/errors/submission-not-found","title":"Submission Not Found","status":404,"detail":"No submission found with id invalid_id"}
+
+# D2: Failure transcript - Rate Limit with Retry-After (429)
+$ curl -i http://localhost:3000/rate-limit-test
+HTTP/1.1 429 Too Many Requests
+Retry-After: 60
+Content-Type: application/problem+json; charset=utf-8
+
+{"type":"https://api.codinghub.com/errors/too-many-requests","title":"Rate Limit Exceeded","status":429,"detail":"You have made too many API calls to Codeforces."}
+
+# D3: Negotiation check (XML)
+$ curl -i -H "Accept: application/xml" http://localhost:3000/submissions/sub_valid123
+HTTP/1.1 200 OK
+Content-Type: application/xml; charset=utf-8
+
+<?xml version='1.0'?>
+<response>
+  <id>sub_valid123</id>
+  <status>accepted</status>
+  <memory>24MB</memory>
+  <runtime>45ms</runtime>
+</response>

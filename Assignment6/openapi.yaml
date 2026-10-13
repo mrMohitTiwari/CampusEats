@@ -1,0 +1,63 @@
+openapi: 3.0.3
+info:
+  title: Coding Hub API
+  version: 1.0.0
+paths:
+  /submissions:
+    post:
+      summary: Submit code to a platform
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [platform, code, language]
+              properties:
+                platform:
+                  type: string
+                code:
+                  type: string
+                language:
+                  type: string
+      responses:
+        '201':
+          description: Created
+          headers:
+            Location:
+              schema:
+                type: string
+        '422':
+          description: Validation Error
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '502':
+          description: Bad Gateway (Platform Down)
+components:
+  schemas:
+    ProblemDetails:
+      type: object
+      properties:
+        type:
+          type: string
+          example: "https://api.codinghub.com/errors/validation-failed"
+        title:
+          type: string
+          example: "Your submission is invalid."
+        status:
+          type: integer
+          example: 422
+        detail:
+          type: string
+          example: "One or more fields failed validation."
+        errors:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+              reason:
+                type: string
