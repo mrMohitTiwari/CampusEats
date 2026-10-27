@@ -1,0 +1,17 @@
+{
+	"folders": [
+		{
+			"name": "CampusEats",
+			"path": "../../../Downloads/CampusEats"
+		},
+		{
+			"name": "Assignment6",
+			"path": "../../../Downloads/Assignment6"
+		},
+		{
+			"name": "WebServices",
+			"path": "."
+		}
+	],
+	"settings": {}
+}
